@@ -1,0 +1,73 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# バックエンド
+backend/.env
+backend/.env.example
+backend/__pycache__/
+backend/**/__pycache__/
+backend/app/__pycache__/
+backend/*.db
+
+# Python仮想環境
+venv/
+env/
+.venv/
+virtualenv/
+backend/venv/
+backend/env/
+backend/.venv/
+
+# Pythonライブラリ
+backend/lib/
+backend/lib64/
+backend/site-packages/
+backend/bin/
+backend/include/
+backend/share/
+backend/.Python
+backend/pip-selfcheck.json
+
+# フロントエンド
+frontend/.env.local
+frontend/.next/
+frontend/node_modules/

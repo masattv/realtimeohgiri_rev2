@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-inter: 'Inter', sans-serif;
+  --font-roboto-mono: 'Roboto Mono', monospace;
+}
+
+@layer base {
+  body {
+    @apply antialiased bg-neutral-950 text-neutral-200;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+  }
+  
+  ::selection {
+    @apply bg-indigo-500/30 text-white;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply rounded-md px-4 py-2 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-950;
+  }
+  
+  .btn-primary {
+    @apply bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500;
+  }
+  
+  .btn-secondary {
+    @apply bg-neutral-800 text-white hover:bg-neutral-700 focus:ring-neutral-600;
+  }
+  
+  .btn-danger {
+    @apply bg-rose-600 text-white hover:bg-rose-700 focus:ring-rose-500;
+  }
+  
+  .card {
+    @apply rounded-xl border border-neutral-800 bg-neutral-900 p-6 transition-all;
+  }
+  
+  .card-hover {
+    @apply hover:border-neutral-700 hover:bg-neutral-800/50;
+  }
+  
+  .input-field {
+    @apply block w-full rounded-md border border-neutral-700 bg-neutral-800 px-4 py-2.5 text-neutral-200 
+           placeholder:text-neutral-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500;
+  }
+  
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500;
+  }
+}
+
+/* Glass effect components */
+.glass-card {
+  @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-xl;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-neutral-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-neutral-700 rounded-full hover:bg-neutral-600;
+}
+
+/* Animation utilities */
+.animate-glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 10px -10px rgba(139, 92, 246, 0.5);
+  }
+  to {
+    box-shadow: 0 0 10px 10px rgba(139, 92, 246, 0.2);
+  }
+}
