@@ -9,6 +9,18 @@ import uvicorn
 # 環境変数から許可するオリジンを取得、なければデフォルト値を使用
 FRONTEND_URLS = os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000,https://realtimeohgiri-rev2.vercel.app,https://realtimeohgiri-rev2-git-main-masattv.vercel.app").split(",")
 
+# ngrokのURLを許可リストに追加
+ALLOWED_ORIGINS = [
+    "http://localhost:3000",              # ローカル開発用
+    "https://realtimeohgiri-rev2.vercel.app",  # Vercel本番環境
+    "https://realtimeohgiri-rev2-git-main-masattv.vercel.app",  # Vercel開発環境
+    "https://f245-2402-6b00-be46-7100-40bc-4f6-7e50-f89f.ngrok-free.app",  # 過去のngrok URL
+    "https://f42f-2402-6b00-be46-7100-40bc-4f6-7e50-f89f.ngrok-free.app",  # 過去のngrok URL
+    "https://b99a-2402-6b00-be46-7100-a824-f355-9d94-3095.ngrok-free.app",  # 現在のngrok URL
+    "https://*.ngrok-free.app",  # ngrokの一般的なドメインパターン
+    "https://*.ngrok.io",        # 旧ngrokドメインパターン
+]
+
 app = FastAPI(
     title="リアルタイム大喜利 API",
     description="リアルタイムに大喜利のお題と回答を管理するAPI",
@@ -18,7 +30,7 @@ app = FastAPI(
 # CORSミドルウェアを追加
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # すべてのオリジンを許可
+    allow_origins=ALLOWED_ORIGINS,  # 許可するオリジンのリスト
     allow_credentials=True,
     allow_methods=["*"],  # すべてのHTTPメソッドを許可
     allow_headers=["*"],  # すべてのHTTPヘッダーを許可
