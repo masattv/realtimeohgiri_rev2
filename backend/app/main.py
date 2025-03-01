@@ -11,6 +11,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",              # ローカル開発用
         "https://realtimeohgiri-rev2.vercel.app",  # Vercel本番環境
+        "https://f245-2402-6b00-be46-7100-40bc-4f6-7e50-f89f.ngrok-free.app",  # ngrok URL
     ],
     allow_credentials=True,
     allow_methods=["*"],
