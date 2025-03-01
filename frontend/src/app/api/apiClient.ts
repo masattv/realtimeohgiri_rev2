@@ -1,6 +1,17 @@
 import axios from 'axios';
 import { Answer } from '../types';
 
+// APIクライアントの設定
+const apiClient = axios.create({
+  // バックエンドのベースURL（環境変数から取得するか直接指定）
+  baseURL: process.env.NEXT_PUBLIC_API_URL || '/api',
+  timeout: 15000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: false,
+});
+
 // デバッグ用ログ関数
 const logRequest = (method: string, url: string, data: any = null) => {
   console.log(`🔍 API ${method} リクエスト: ${url}`, data ? { data } : '');
@@ -20,31 +31,6 @@ const logError = (method: string, url: string, error: any) => {
     config: error.config
   });
 };
-
-// プロキシルートを使って内部APIパスを構築
-const getProxyPath = (path: string) => {
-  // 先頭のスラッシュを削除（ある場合）
-  const cleanPath = path.startsWith('/') ? path.substring(1) : path;
-  
-  // /api を削除（ある場合）
-  const finalPath = cleanPath.startsWith('api/') 
-    ? cleanPath.substring(4) 
-    : cleanPath;
-    
-  // Vercel環境では直接/apiパスを使用する
-  return `/api/${finalPath}`;
-};
-
-// APIクライアントの設定
-const apiClient = axios.create({
-  // 同一オリジンのプロキシURLを使用
-  baseURL: '',
-  timeout: 15000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  withCredentials: false,
-});
 
 // インターセプターを追加
 apiClient.interceptors.request.use(
@@ -92,7 +78,7 @@ apiClient.interceptors.response.use(
 export const topicsApi = {
   // アクティブなお題を取得
   getActiveTopic: async () => {
-    const url = getProxyPath('topics/active');
+    const url = 'topics/active';
     logRequest('GET', url);
     try {
       const response = await apiClient.get(url);
@@ -106,7 +92,7 @@ export const topicsApi = {
 
   // 特定のお題の詳細を取得（回答も含む）
   getTopicDetail: async (topicId: number) => {
-    const url = getProxyPath(`topics/${topicId}`);
+    const url = `topics/${topicId}`;
     logRequest('GET', url);
     try {
       const response = await apiClient.get(url);
@@ -120,7 +106,7 @@ export const topicsApi = {
 
   // お題一覧を取得（ページネーション対応）
   getTopics: async (limit: number = 5, offset: number = 0) => {
-    const url = getProxyPath(`topics?limit=${limit}&offset=${offset}`);
+    const url = `topics?limit=${limit}&offset=${offset}`;
     logRequest('GET', url);
     try {
       const response = await apiClient.get(url);
@@ -134,7 +120,7 @@ export const topicsApi = {
 
   // 新しいお題を生成
   generateTopic: async () => {
-    const url = getProxyPath('topics/generate');
+    const url = 'topics/generate';
     logRequest('POST', url);
     try {
       const response = await apiClient.post(url);
@@ -148,7 +134,7 @@ export const topicsApi = {
 
   // 強制的に新しいお題を生成
   generateTopicForce: async () => {
-    const url = getProxyPath('topics/generate/force');
+    const url = 'topics/generate/force';
     logRequest('POST', url);
     try {
       const response = await apiClient.post(url);
@@ -164,7 +150,7 @@ export const topicsApi = {
 export const answersApi = {
   // 回答を投稿
   createAnswer: async (data: { topic_id: number, content: string, user_name: string, user_id: string }) => {
-    const url = getProxyPath('answers');
+    const url = 'answers';
     logRequest('POST', url, data);
     try {
       const response = await apiClient.post(url, data);
@@ -178,7 +164,7 @@ export const answersApi = {
 
   // トピックに対する回答一覧を取得
   getAnswersByTopic: async (topicId: number) => {
-    const url = getProxyPath(`answers/topic/${topicId}`);
+    const url = `answers/topic/${topicId}`;
     logRequest('GET', url);
     try {
       const response = await apiClient.get(url);
@@ -192,7 +178,7 @@ export const answersApi = {
 
   // 特定の回答を取得
   getAnswer: async (answerId: number) => {
-    const url = getProxyPath(`answers/${answerId}`);
+    const url = `answers/${answerId}`;
     logRequest('GET', url);
     try {
       const response = await apiClient.get(url);
@@ -206,7 +192,7 @@ export const answersApi = {
 
   // 回答をAIで評価
   evaluateAnswer: async (answerId: number) => {
-    const url = getProxyPath('answers/evaluate');
+    const url = 'answers/evaluate';
     const requestData = { answer_id: answerId };
     logRequest('POST', url, requestData);
     try {
