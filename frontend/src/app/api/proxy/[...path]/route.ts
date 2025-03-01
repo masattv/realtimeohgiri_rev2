@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // バックエンドAPIのURL
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api';
+// 注意: Vercel環境では/apiへのリクエストがリライトルールによってバックエンドにリダイレクトされます
+const API_BASE_URL = '/api';
 
 export async function GET(
   request: NextRequest,
@@ -82,7 +83,7 @@ export async function POST(
   console.log(`🔄 プロキシPOSTリクエスト: ${apiURL}`);
   
   try {
-    let requestOptions: RequestInit = {
+    const requestOptions: RequestInit = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -96,7 +97,7 @@ export async function POST(
         const body = await request.json();
         console.log('🔄 リクエストボディ', body);
         requestOptions.body = JSON.stringify(body);
-      } catch (e) {
+      } catch {
         console.log('🔄 JSONボディなし');
       }
     } else {
@@ -117,8 +118,8 @@ export async function POST(
         try {
           const errorData = await response.json();
           return NextResponse.json(errorData, { status: response.status });
-        } catch (e) {
-          console.error('❌ JSONパースエラー:', e);
+        } catch {
+          console.error('❌ JSONパースエラー');
           return NextResponse.json(
             { error: await response.text() },
             { status: response.status }
@@ -146,4 +147,4 @@ export async function POST(
       { status: 500 }
     );
   }
-} 
+}
