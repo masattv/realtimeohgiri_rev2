@@ -8,7 +8,10 @@ app = FastAPI(title="リアルタイム大喜利API", description="AIが大喜�
 # CORS設定
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 本番環境では適切なオリジンに制限する
+    allow_origins=[
+        "http://localhost:3000",              # ローカル開発用
+        "https://realtimeohgiri-rev2.vercel.app",  # Vercel本番環境
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

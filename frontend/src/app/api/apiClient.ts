@@ -31,7 +31,8 @@ const getProxyPath = (path: string) => {
     ? cleanPath.substring(4) 
     : cleanPath;
     
-  return `/api/proxy/${finalPath}`;
+  // Vercel環境では直接/apiパスを使用する
+  return `/api/${finalPath}`;
 };
 
 // APIクライアントの設定
