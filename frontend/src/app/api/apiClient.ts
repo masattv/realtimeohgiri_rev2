@@ -4,7 +4,7 @@ import { Answer } from '../types';
 // APIクライアントの設定
 const apiClient = axios.create({
   // バックエンドのベースURL（ngrok URLを使用）
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://f42f-2402-6b00-be46-7100-40bc-4f6-7e50-f89f.ngrok-free.app/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://b99a-2402-6b00-be46-7100-a824-f355-9d94-3095.ngrok-free.app/api',
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',

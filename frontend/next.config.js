@@ -11,7 +11,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: process.env.NEXT_PUBLIC_BACKEND_URL || 'https://f42f-2402-6b00-be46-7100-40bc-4f6-7e50-f89f.ngrok-free.app/api/:path*',
+        destination: process.env.NEXT_PUBLIC_BACKEND_URL || 'https://b99a-2402-6b00-be46-7100-a824-f355-9d94-3095.ngrok-free.app/api/:path*',
       },
     ]
   },
