@@ -3,9 +3,9 @@ import { Answer } from '../types';
 
 // APIクライアントの設定
 const apiClient = axios.create({
-  // バックエンドのベースURL（環境変数または相対パスを使用）
-  baseURL: process.env.NEXT_PUBLIC_API_URL || '/api',
-  timeout: 20000,  // タイムアウトを20秒に増やす
+  // バックエンドのベースURL（ngrok URLを使用）
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://b99a-2402-6b00-be46-7100-a824-f355-9d94-3095.ngrok-free.app/api',
+  timeout: 20000,  // タイムアウトを20秒に設定
   headers: {
     'Content-Type': 'application/json',
   },
