@@ -1,21 +1,27 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
+import os
+from app.database import SessionLocal, engine, Base
 from app.routers import topics, answers, votes
+from app.models import *
+import uvicorn
 
-app = FastAPI(title="リアルタイム大喜利API", description="AIが大喜利のお題を生成し、回答を評価するAPI")
+# 環境変数から許可するオリジンを取得、なければデフォルト値を使用
+FRONTEND_URLS = os.environ.get("ALLOWED_ORIGINS", "http://localhost:3000,https://realtimeohgiri-rev2.vercel.app,https://realtimeohgiri-rev2-git-main-masattv.vercel.app").split(",")
 
-# CORS設定
+app = FastAPI(
+    title="リアルタイム大喜利 API",
+    description="リアルタイムに大喜利のお題と回答を管理するAPI",
+    version="0.1.0",
+)
+
+# CORSミドルウェアを追加
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",              # ローカル開発用
-        "https://realtimeohgiri-rev2.vercel.app",  # Vercel本番環境
-        "https://f245-2402-6b00-be46-7100-40bc-4f6-7e50-f89f.ngrok-free.app",  # ngrok URL
-    ],
+    allow_origins=["*"],  # すべてのオリジンを許可
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # すべてのHTTPメソッドを許可
+    allow_headers=["*"],  # すべてのHTTPヘッダーを許可
 )
 
 # ルーターの登録
@@ -23,7 +29,7 @@ app.include_router(topics.router, prefix="/api/topics", tags=["topics"])
 app.include_router(answers.router, prefix="/api/answers", tags=["answers"])
 app.include_router(votes.router, prefix="/api/votes", tags=["votes"])
 
-@app.get("/")
+@app.get("/api")
 async def root():
     return {"message": "リアルタイム大喜利APIへようこそ！"}
 
