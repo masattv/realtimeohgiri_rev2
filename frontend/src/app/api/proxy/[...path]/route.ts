@@ -1,118 +1,86 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// バックエンドAPI URLの設定（環境変数または指定のURL）
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://b99a-2402-6b00-be46-7100-a824-f355-9d94-3095.ngrok-free.app/api';
+// バックエンドAPIのベースURL
+const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? 'https://realtimeohgiri-backend.onrender.com/api'
+  : 'http://localhost:8000/api';
 
-/**
- * API へのプロキシリクエストを処理する関数
- */
-export async function GET(request: NextRequest, { params }: { params: { path: string[] } }) {
+// CORSヘッダー
+export const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+// OPTIONSリクエスト（プリフライト）の処理
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
+// API Gateway - バックエンドへのプロキシ
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { path: string[] } }
+) {
   const path = params.path.join('/');
-  
-  // パラメータをログに出力
-  console.log(`GET リクエストのパラメータ解決: ${path}`);
+  const url = new URL(req.url);
+  const queryString = url.search;
   
   try {
-    // バックエンドAPIにリクエストを転送
-    const apiUrl = `${API_BASE_URL}/${path}${request.nextUrl.search}`;
-    console.log(`バックエンドURL: ${apiUrl}`);
-    
-    const response = await fetch(apiUrl, {
+    const response = await fetch(`${API_BASE_URL}/${path}${queryString}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     });
+
+    const data = await response.json();
     
-    // レスポンスのクローンを作成して内容を確認
-    const responseClone = response.clone();
-    
-    try {
-      // JSON レスポンスを解析
-      const data = await responseClone.json();
-      
-      // エラーレスポンスの場合の処理
-      if (!response.ok) {
-        console.error(`バックエンドからのエラー: ${response.status} ${response.statusText}`, data);
-        return NextResponse.json(data, { status: response.status });
-      }
-      
-      return NextResponse.json(data);
-    } catch (error) {
-      // JSON 以外のレスポンスの場合は素のレスポンスを返す
-      console.log('バックエンドからのレスポンスは JSON ではありません');
-      const text = await response.text();
-      return new NextResponse(text, {
-        status: response.status,
-        headers: {
-          'Content-Type': response.headers.get('Content-Type') || 'text/plain',
-        },
-      });
-    }
+    return NextResponse.json(data, {
+      status: response.status,
+      headers: corsHeaders,
+    });
   } catch (error) {
-    console.error(`プロキシエラー: ${error}`);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error(`Error proxying GET request to /${path}:`, error);
+    return NextResponse.json(
+      { error: 'APIリクエストの処理中にエラーが発生しました' },
+      { status: 500, headers: corsHeaders }
+    );
   }
 }
 
-/**
- * API へのプロキシPOSTリクエストを処理する関数
- */
-export async function POST(request: NextRequest, { params }: { params: { path: string[] } }) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { path: string[] } }
+) {
   const path = params.path.join('/');
-  
-  // パラメータをログに出力
-  console.log(`POST リクエストのパラメータ解決: ${path}`);
+  const body = await req.json();
   
   try {
-    // リクエストボディの取得
-    let requestBody;
-    try {
-      requestBody = await request.json();
-    } catch (e) {
-      console.log('JSON リクエストボディがありません');
-      requestBody = null;
-    }
-    
-    // バックエンドAPIにリクエストを転送
-    const apiUrl = `${API_BASE_URL}/${path}`;
-    console.log(`バックエンドURL: ${apiUrl}`, requestBody);
-    
-    const response = await fetch(apiUrl, {
+    const response = await fetch(`${API_BASE_URL}/${path}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: requestBody ? JSON.stringify(requestBody) : undefined,
+      body: JSON.stringify(body),
     });
+
+    const data = await response.json();
     
-    // レスポンスのクローンを作成して内容を確認
-    const responseClone = response.clone();
-    
-    try {
-      // JSON レスポンスを解析
-      const data = await responseClone.json();
-      
-      // エラーレスポンスの場合の処理
-      if (!response.ok) {
-        console.error(`バックエンドからのエラー: ${response.status} ${response.statusText}`, data);
-        return NextResponse.json(data, { status: response.status });
-      }
-      
-      return NextResponse.json(data);
-    } catch (error) {
-      // JSON 以外のレスポンスの場合は素のレスポンスを返す
-      console.log('バックエンドからのレスポンスは JSON ではありません');
-      const text = await response.text();
-      return new NextResponse(text, {
-        status: response.status,
-        headers: {
-          'Content-Type': response.headers.get('Content-Type') || 'text/plain',
-        },
-      });
-    }
+    return NextResponse.json(data, {
+      status: response.status,
+      headers: corsHeaders,
+    });
   } catch (error) {
-    console.error(`プロキシエラー: ${error}`);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error(`Error proxying POST request to /${path}:`, error);
+    return NextResponse.json(
+      { error: 'APIリクエストの処理中にエラーが発生しました' },
+      { status: 500, headers: corsHeaders }
+    );
   }
-} 
+}
+
+// 他のHTTPメソッド（PUT, DELETE）も同様に追加できます 

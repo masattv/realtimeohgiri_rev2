@@ -1,15 +1,24 @@
 import axios from 'axios';
 import { Answer } from '../types';
 
-// APIクライアントの設定
+// API基本URLを環境に応じて設定
+const getBaseUrl = () => {
+  // 本番環境（Netlify）ではリダイレクトを使用
+  if (process.env.NODE_ENV === 'production') {
+    return '/api';
+  }
+  
+  // 開発環境（ローカル）
+  return 'http://localhost:8000/api';
+};
+
+// Axiosインスタンスの作成
 const apiClient = axios.create({
-  // バックエンドのベースURL（ngrok URLを使用）
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://b99a-2402-6b00-be46-7100-a824-f355-9d94-3095.ngrok-free.app/api',
-  timeout: 20000,  // タイムアウトを20秒に設定
+  baseURL: getBaseUrl(),
+  timeout: 20000, // 20秒
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: false,
 });
 
 // デバッグ用ログ関数
@@ -32,49 +41,36 @@ const logError = (method: string, url: string, error: any) => {
   });
 };
 
-// インターセプターを追加
+// リクエストインターセプター
 apiClient.interceptors.request.use(
   (config) => {
-    console.log('📤 リクエスト送信:', {
-      method: config.method,
-      url: config.url,
-      baseURL: config.baseURL,
-      data: config.data,
-      headers: config.headers
-    });
+    // リクエストが送信される前に実行される処理
+    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
     return config;
   },
   (error) => {
-    console.error('📤 リクエストエラー:', error);
+    // リクエストエラーの処理
+    console.error('API Request Error:', error);
     return Promise.reject(error);
   }
 );
 
+// レスポンスインターセプター
 apiClient.interceptors.response.use(
   (response) => {
-    console.log('📥 レスポンス受信:', {
-      status: response.status,
-      statusText: response.statusText,
-      data: response.data,
-      headers: response.headers
-    });
+    // 2xx範囲内のステータスコードの処理
     return response;
   },
   (error) => {
+    // レスポンスエラーの処理
     if (error.code === 'ECONNABORTED') {
-      console.error('📥 タイムアウトエラー:', error.message);
-    } else if (!error.response) {
-      console.error('📥 ネットワークエラー:', error.message);
+      console.error('API Request Timeout');
+    } else if (error.response) {
+      console.error(`API Error ${error.response.status}:`, error.response.data);
+    } else if (error.request) {
+      console.error('Network Error: No response received');
     } else {
-      console.error('📥 レスポンスエラー:', {
-        message: error.message,
-        config: error.config,
-        response: error.response ? {
-          status: error.response.status,
-          statusText: error.response.statusText,
-          data: error.response.data
-        } : 'レスポンスなし'
-      });
+      console.error('API Request Failed:', error.message);
     }
     return Promise.reject(error);
   }

@@ -45,5 +45,12 @@ app.include_router(votes.router, prefix="/api/votes", tags=["votes"])
 async def root():
     return {"message": "リアルタイム大喜利APIへようこそ！"}
 
+@app.get("/health")
+async def health_check():
+    """
+    ヘルスチェックエンドポイント（Renderのデプロイ確認用）
+    """
+    return {"status": "healthy"}
+
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True) 
